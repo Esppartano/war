@@ -24,29 +24,33 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import Model.Match;
+
 
 public class Tabuleiro extends JPanel
 {
 	private Menu menu;
+	Match match;
 	private Image dadoImage_at;
 	private Image dadoImage_def;
 	private JFrame cardFrame;
 	
 	int valorAtaque;
 	int valorDefesa;
-	
+
 	public Tabuleiro(Menu menu, int numPlayers, Color[] playerColors, String[] playerNames)
 	{
 		Font font = new Font("Times New Roman", Font.BOLD,14);
-		this.menu = menu;
-		setLayout(null);
-		JButton save = new JButton("Salvar Jogo");
+        this.menu = menu;
+        setLayout(null);
+        JButton save = new JButton("Salvar Jogo");
 		JButton dado = new JButton("Jogar Dados");
 		JButton vez = new JButton("Passar Vez");
 		JButton cartas = new JButton("Mostrar Cartas");
 		JButton testeFim = new JButton("Teste. Fim");
+		addMouseListener(new MapMouseListener());
 		testeFim.addActionListener(e -> menu.endGame());
-		save.addActionListener(e -> this.menu.saveGame());
+    	save.addActionListener(e -> this.menu.saveGame());
 		dado.addActionListener(e-> Lancar_dados());
 		vez.addActionListener(e-> PassarVez());
 		cartas.addActionListener(e->playerCards(numPlayers, playerColors, playerNames));
@@ -65,7 +69,7 @@ public class Tabuleiro extends JPanel
 		add(dado);
 		add(vez);
 		add(cartas);
-	}
+    }
 	
 	private void playerCards(int numPlayers, Color[] playerColors, String[] playerNames)
 	{
@@ -108,40 +112,43 @@ public class Tabuleiro extends JPanel
 	}
 
 	public void Lancar_dados()
-	{
+	{		
 		JFrame dDialog = new JFrame("Lançamento dos Dados");
 		dDialog.setSize(300, 200);
 		dDialog.setLocationRelativeTo(this);
 		Container c = dDialog.getContentPane();
-		c.setLayout(new GridLayout(3, 2));
-		JLabel labelAtaque = new JLabel("Valor do Dado de Ataque:");
-		JTextField textFieldAtaque = new JTextField();
-		JLabel labelDefesa = new JLabel("Valor do Dado de Defesa:");
-		JTextField textFieldDefesa = new JTextField();
+		
+        c.setLayout(new GridLayout(3, 2));
+
+        JLabel labelAtaque = new JLabel("Valor do Dado de Ataque:");
+        JTextField textFieldAtaque = new JTextField();
+        JLabel labelDefesa = new JLabel("Valor do Dado de Defesa:");
+        JTextField textFieldDefesa = new JTextField();
 		JButton randButton = new JButton("Aleatório");
 		JButton confirmButton = new JButton("Confirmar");
 		
-		confirmButton.addActionListener(e ->
+        confirmButton.addActionListener(e ->
 		{
-			valorAtaque = Integer.parseInt(textFieldAtaque.getText());
-			valorDefesa = Integer.parseInt(textFieldDefesa.getText());
+            valorAtaque = Integer.parseInt(textFieldAtaque.getText());
+            valorDefesa = Integer.parseInt(textFieldDefesa.getText());
 			
 			if (valorAtaque >= 1 && valorAtaque <= 6 && valorDefesa >= 1 && valorDefesa <= 6)
 			{
-				// Atualiza as imagens dos dados com base nos valores escolhidos
-				String imageNameAt = "assets/images/dado_ataque_" + valorAtaque + ".png";
-				dadoImage_at = loadImage(imageNameAt);
-				String imageNameDef = "assets/images/dado_defesa_" + valorDefesa + ".png";
-				dadoImage_def = loadImage(imageNameDef);
+        		// Atualiza as imagens dos dados com base nos valores escolhidos
+        		String imageNameAt = "assets/images/dado_ataque_" + valorAtaque + ".png";
+       			dadoImage_at = loadImage(imageNameAt);
+        		String imageNameDef = "assets/images/dado_defesa_" + valorDefesa + ".png";
+        		dadoImage_def = loadImage(imageNameDef);
+
 				System.out.println("Dado Ataque: "+ valorAtaque+"\n"+"Dado Defesa: "+ valorDefesa);
-				// Redesenha o painel para exibir as novas imagens
-				this.repaint();
-			}
+        		// Redesenha o painel para exibir as novas imagens
+        		this.repaint();
+    		}
 			else
 			{
 				JOptionPane.showMessageDialog(this, "Valor(es) inválido(s).", "Atenção!!!", JOptionPane.WARNING_MESSAGE);
 			}
-		});
+        });
 
 		randButton.addActionListener(e->
 		{
@@ -158,16 +165,16 @@ public class Tabuleiro extends JPanel
 			this.repaint();
 			System.out.println("Dado Ataque: "+ numeroAleatorio_at+"\n"+"Dado Defesa: "+ numeroAleatorio_def);
 		});
-		
-		c.add(labelAtaque);
-		c.add(textFieldAtaque);
-		c.add(labelDefesa);
-		c.add(textFieldDefesa);
+
+        c.add(labelAtaque);
+        c.add(textFieldAtaque);
+        c.add(labelDefesa);
+        c.add(textFieldDefesa);
 		c.add(randButton);
 		c.add(confirmButton);
 		dDialog.pack();
 		dDialog.setVisible(true);
-	}
+    }
 	
 	protected void paintComponent(Graphics g)
 	{
@@ -215,28 +222,29 @@ public class Tabuleiro extends JPanel
 		G2D.draw(rt2);
 		G2D.fill(rt2);
 
-		//Dados
+		//
 		showDices(G2D);
 		
-		//países
+        //países
+
 		//Am. Sul
 		//G2D.setColor(Color.white);
 		countryPosition(g,G2D,"Argentina", 247, 560);
-		countryPosition(g,G2D,"Brasil", 265, 440);
+        countryPosition(g,G2D,"Brasil", 265, 440);
 		countryPosition(g,G2D,"Peru", 220, 480);
 		countryPosition(g,G2D,"Venezuela", 162, 430);
 
 		//Oceania
 		//G2D.setColor(Color.white);
 		countryPosition(g,G2D,"Austrália", 852, 593);
-		countryPosition(g,G2D,"Indonésia", 865, 495);
+        countryPosition(g,G2D,"Indonésia", 865, 495);
 		countryPosition(g,G2D,"Nova Zelândia", 896, 640);
 		countryPosition(g,G2D,"Perth", 795, 593);
 
 		//África
 		//G2D.setColor(Color.white);
 		countryPosition(g,G2D,"África do Sul", 538, 557);
-		countryPosition(g,G2D,"Angola", 535, 497);
+        countryPosition(g,G2D,"Angola", 535, 497);
 		countryPosition(g,G2D,"Argélia", 440, 359);
 		countryPosition(g,G2D,"Egito", 552, 373);
 		countryPosition(g,G2D,"Nigéria", 490, 420);
@@ -245,22 +253,22 @@ public class Tabuleiro extends JPanel
 		//Europa
 		//G2D.setColor(Color.white);
 		countryPosition(g,G2D,"Espanha", 419, 275);
-		countryPosition(g,G2D,"França", 471, 235);
+        countryPosition(g,G2D,"França", 471, 235);
 		countryPosition(g,G2D,"Itália", 528, 234);
 		countryPosition(g,G2D,"Polônia", 554, 190);
 		countryPosition(g,G2D,"Reino Unido", 430, 151);
-		countryPosition(g,G2D,"Romênia", 558, 270);
+        countryPosition(g,G2D,"Romênia", 558, 270);
 		countryPosition(g,G2D,"Suécia", 535, 114);
 		countryPosition(g,G2D,"Ucrânia", 587, 227);
 
 		//Am. Norte/Central
 		//G2D.setColor(Color.white);
 		countryPosition(g,G2D,"Alasca", 85, 126);
-		countryPosition(g,G2D,"Calgary", 158, 138);
+        countryPosition(g,G2D,"Calgary", 158, 138);
 		countryPosition(g,G2D,"Califórnia", 97, 242);
 		countryPosition(g,G2D,"Groelândia", 295, 103);
 		countryPosition(g,G2D,"México", 125, 350);
-		countryPosition(g,G2D,"Nova Iorque", 209, 256);
+        countryPosition(g,G2D,"Nova Iorque", 209, 256);
 		countryPosition(g,G2D,"Quebec", 275, 180);
 		countryPosition(g,G2D,"Texas", 170, 231);
 		countryPosition(g,G2D,"Vancouver", 131, 184);
@@ -268,20 +276,20 @@ public class Tabuleiro extends JPanel
 		//Ásia
 		//G2D.setColor(Color.white);
 		countryPosition(g,G2D,"Arábia Saudita", 640, 400);
-		countryPosition(g,G2D,"Bangladesh", 818, 385);
+        countryPosition(g,G2D,"Bangladesh", 818, 385);
 		countryPosition(g,G2D,"Cazaquistão", 781, 210);
 		countryPosition(g,G2D,"China", 777, 281);
 		countryPosition(g,G2D,"Coreia do Norte", 829, 300);
-		countryPosition(g,G2D,"Coreia do Sul", 829, 329);
+        countryPosition(g,G2D,"Coreia do Sul", 829, 329);
 		countryPosition(g,G2D,"Estônia", 661, 132);
 		countryPosition(g,G2D,"Índia", 783, 372);
 		countryPosition(g,G2D,"Irã", 708, 330);
 		countryPosition(g,G2D,"Iraque", 658, 338);
-		countryPosition(g,G2D,"Japão", 926, 248);
+        countryPosition(g,G2D,"Japão", 926, 248);
 		countryPosition(g,G2D,"Jordânia", 598, 330);
 		countryPosition(g,G2D,"Letônia", 627, 185);
 		countryPosition(g,G2D,"Mongólia", 828, 249);
-		countryPosition(g,G2D,"Paquistão", 708, 301);
+        countryPosition(g,G2D,"Paquistão", 708, 301);
 		countryPosition(g,G2D,"Rússia", 777, 135);
 		countryPosition(g,G2D,"Sibéria", 880, 130);
 		countryPosition(g,G2D,"Síria", 638, 272);
@@ -504,7 +512,6 @@ public class Tabuleiro extends JPanel
 		Ellipse2D circle = new Ellipse2D.Double(x, y-60, w, h);
 		g2d.draw(circle);
 		return circle;
-
 	}
 
 	private void fillPlayerCircle(Graphics2D g2d, Ellipse2D country, Color playerColor)
@@ -527,6 +534,7 @@ public class Tabuleiro extends JPanel
 			G2D.drawRect(1105, 200, 32*2, 32*2);
 		}
 	}
+	
 	private void drawNumber(Graphics2D g2d, Ellipse2D circle, String number)
 	{
 		//g2d.draw(circle);
@@ -546,4 +554,5 @@ public class Tabuleiro extends JPanel
     	}
     	return image;
 	}	
+
 }

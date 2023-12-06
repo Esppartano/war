@@ -1,10 +1,12 @@
 package Model;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-class Game{
+class Game {
     private List<Objective> objectives;
     private List<TerritoryCard> cards;
     private List<Territory> territories;
@@ -22,24 +24,24 @@ class Game{
     }
 
 
-    private TerritoryCard createCard(String name, Territory territory, String shape){
+    private TerritoryCard createCard(String name, Territory territory, String shape) {
         return new TerritoryCard(name, territory, shape);
     }
 
-    private Territory createTerritory(String name){
+    private Territory createTerritory(String name) {
         return new Territory(name);
     }
 
-    private Continent createContinent(String name){
+    private Continent createContinent(String name) {
         return new Continent(name);
     }
 
-    private Player createPlayer(String name, String color, int order){
-        return new Player(name, color, order);
+    private Player createPlayer(String name, Color color, int order) {
+        return new Player(name, color);
     }
 
 
-    protected void generateListTerritoriesAndObjectives(){
+    protected void generateListTerritoriesAndObjectives() {
         Territory africa_do_sul = createTerritory("Africa do Sul");
         this.territories.add(africa_do_sul);
         Territory angola = createTerritory("Angola");
@@ -341,7 +343,7 @@ class Game{
         ConquerContinentObjective south_america_and_europe_and_third = new ConquerContinentObjective("Conquistar America do Sul, Europa e um terceiro continente", 0, obj3);
         this.objectives.add(south_america_and_europe_and_third);
 
-        ConquerTerritoriesObjective territories_with_2_armies = new ConquerTerritoriesObjective("Conquistar 18 territorios com 2 exercitos em cada", 18,  2);
+        ConquerTerritoriesObjective territories_with_2_armies = new ConquerTerritoriesObjective("Conquistar 18 territorios com 2 exercitos em cada", 18, 2);
         this.objectives.add(territories_with_2_armies);
 
         ArrayList<Continent> obj5 = new ArrayList<>();
@@ -385,7 +387,7 @@ class Game{
 
     }
 
-    protected void generateListTerritoryCards(){
+    protected void generateListTerritoryCards() {
         this.cards.add(createCard("Africa do Sul", this.territories.get(0), "Triangulo"));
         this.cards.add(createCard("Angola", this.territories.get(1), "Quadrado"));
         this.cards.add(createCard("Argelia", this.territories.get(2), "Circulo"));
@@ -489,61 +491,180 @@ class Game{
         this.deck = deck;
     }
 
-    public void addPlayer(Player player){
+    public void addPlayer(Player player) {
         this.players.add(player);
     }
 
-    public void removePlayer(Player player){
+    public void removePlayer(Player player) {
         this.players.remove(player);
     }
 
-    protected Player getPlayerByName(String name){
-        for(Player player : this.players){
-            if(player.getName().equals(name)){
+    protected Player getPlayerByName(String name) {
+        for (Player player : this.players) {
+            if (player.getName().equals(name)) {
                 return player;
             }
         }
         return null;
     }
 
-    protected Territory getTerritoryByName(String name){
-        for(Territory territory : this.territories){
-            if(territory.getName().equals(name)){
+    protected Territory getTerritoryByName(String name) {
+        for (Territory territory : this.territories) {
+            if (territory.getName().equals(name)) {
                 return territory;
             }
         }
         return null;
     }
 
-    protected void randomPlayerOrder(){
+    protected void randomPlayerOrder() {
         // randomizes player order and sets the order for each player object
         Collections.shuffle(this.players);
-        for(int i = 0; i < this.players.size(); i++){
+        for (int i = 0; i < this.players.size(); i++) {
             this.players.get(i).setOrder(i);
         }
     }
 
-    protected void shuffleObjectives(){
+    protected void shuffleObjectives() {
         Collections.shuffle(this.objectives);
     }
 
-    protected void drawObjectives(){
-        for(Player player : this.players){
+    protected void drawObjectives() {
+        for (Player player : this.players) {
             player.setObjective(this.objectives.get(0));
             this.objectives.remove(0);
         }
     }
 
-    protected void shuffleCards(){
+    protected void shuffleCards() {
         Collections.shuffle(this.cards);
     }
 
-    protected void drawCards(){
-        for(Player player : this.players){
+    protected void drawCards() {
+        for (Player player : this.players) {
             Territory tmp = getTerritoryByName(this.cards.get(0).getName());
+            tmp.setArmies(1);
             this.cards.remove(0);
             tmp.setOwner(player);
         }
+    }
+
+    protected void turn(Player player) {
+
+    }
+
+    protected void turns() {
+        while (true) {
+            for (Player player : this.players) {
+                // TODO: implement turn logic
+
+                if (player.getObjective().isComplete(player)) {
+                    System.out.println(player.getName() + " venceu o jogo!");
+                    return;
+                }
+            }
+        }
+    }
+
+    protected void attackTerritory(Territory attacker, Territory defender) {
+        Dice dice = new Dice();
+        if (attacker.getArmies() > 1) {
+            int attackerDice = 0;
+            int defenderDice = 0;
+            if (attacker.getArmies() > 3) {
+                attackerDice = 3;
+            } else if (attacker.getArmies() == 3) {
+                attackerDice = 2;
+            } else if (attacker.getArmies() == 2) {
+                attackerDice = 1;
+            }
+            if (defender.getArmies() > 1) {
+                defenderDice = 2;
+            } else if (defender.getArmies() == 1) {
+                defenderDice = 1;
+            }
+            int[] attackerRoll = new int[attackerDice];
+            int[] defenderRoll = new int[defenderDice];
+            for (int i = 0; i < attackerDice; i++) {
+                attackerRoll[i] = dice.roll();
+            }
+            for (int i = 0; i < defenderDice; i++) {
+                defenderRoll[i] = dice.roll();
+            }
+            Arrays.sort(attackerRoll);
+            Arrays.sort(defenderRoll);
+            for (int i = 0; i < defenderDice; i++) {
+                if (attackerRoll[attackerDice - 1 - i] > defenderRoll[defenderDice - 1 - i]) {
+                    defender.setArmies(defender.getArmies() - 1);
+                } else {
+                    attacker.setArmies(attacker.getArmies() - 1);
+                }
+            }
+        }
+    }
+
+    protected void attackTerritoryNotRandom(int[] diceValuesAttack, int[] diceValuesDefense, Territory attacker, Territory defender) {
+        if (attacker.getArmies() > 1) {
+            int attackerDice = 0;
+            int defenderDice = 0;
+            if (attacker.getArmies() > 3) {
+                attackerDice = 3;
+            } else if (attacker.getArmies() == 3) {
+                attackerDice = 2;
+            } else if (attacker.getArmies() == 2) {
+                attackerDice = 1;
+            }
+            if (defender.getArmies() > 1) {
+                defenderDice = 2;
+            } else if (defender.getArmies() == 1) {
+                defenderDice = 1;
+            }
+            int[] attackerRoll = new int[attackerDice];
+            int[] defenderRoll = new int[defenderDice];
+            System.arraycopy(diceValuesAttack, 0, attackerRoll, 0, attackerDice);
+            System.arraycopy(diceValuesDefense, 0, defenderRoll, 0, defenderDice);
+            Arrays.sort(attackerRoll);
+            Arrays.sort(defenderRoll);
+            for (int i = 0; i < defenderDice; i++) {
+                if (attackerRoll[attackerDice - 1 - i] > defenderRoll[defenderDice - 1 - i]) {
+                    defender.setArmies(defender.getArmies() - 1);
+                } else {
+                    attacker.setArmies(attacker.getArmies() - 1);
+                }
+            }
+        }
+    }
+
+    protected void moveArmies(Territory origin, Territory destination, int armies) {
+        if (origin.getArmies() > armies) {
+            origin.setArmies(origin.getArmies() - armies);
+            destination.setArmies(destination.getArmies() + armies);
+        }
+    }
+
+    protected String saveGameState(){
+        StringBuilder gameState = new StringBuilder();
+        gameState.append("Territories:\n");
+        for(Territory territory : this.territories){
+            if (territory.getOwner() != null) {
+                gameState.append(territory.getName()).append(" ").append(territory.getOwner().getName()).append(" ").append(territory.getArmies()).append("\n");
+            } else {
+                gameState.append(territory.getName()).append(" ").append("null").append(" ").append(territory.getArmies()).append("\n");
+            }
+        }
+        gameState.append("Players:\n");
+        for(Player player : this.players){
+            gameState.append(player.getName()).append(" ").append(player.getColor()).append(" ").append(player.getOrder()).append(" ").append(player.getObjective().getDescription()).append("\n");
+        }
+        gameState.append("Cards:\n");
+        for(TerritoryCard card : this.cards){
+            gameState.append(card.getName()).append(" ").append(card.getTerritory().getName()).append(" ").append(card.getShape()).append("\n");
+        }
+        gameState.append("Objectives:\n");
+        for(Objective objective : this.objectives) {
+            gameState.append(objective.getDescription()).append("\n");
+        }
+        return gameState.toString();
     }
 
 }

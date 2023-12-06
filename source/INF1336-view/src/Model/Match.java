@@ -1,13 +1,14 @@
 package Model;
 
-/* class that implements a singleton and facade pattern to manage the game */
+import java.awt.*;
+import java.util.ArrayList;
 
 public class Match {
-    public static Match instance = null;
+    public static Match instance;
     private Game game;
 
     private Match() {
-        game = new Game();
+        this.game = new Game();
     }
 
     public static Match getInstance() {
@@ -17,31 +18,45 @@ public class Match {
         return instance;
     }
 
-    public void generateListTerritoriesAndObjectives() {
-        game.generateListTerritoriesAndObjectives();
+    public void startGame(ArrayList<Player> players){
+        this.game.generateListTerritoriesAndObjectives();
+        this.game.generateListTerritoryCards();
+        for(Player player : players){
+            this.game.addPlayer(player);
+        }
+        this.game.randomPlayerOrder();
+        this.game.shuffleObjectives();
+        this.game.shuffleCards();
+        this.game.drawObjectives(); // draws the objectives and assigns them to the players
+        this.game.drawCards(); // draws the cards and assigns the territories to the players
     }
 
-    public void generateListTerritoryCards() {
-        game.generateListTerritoryCards();
+    public ArrayList<Player> getPlayers(){
+        return (ArrayList<Player>) this.game.getPlayers();
     }
 
-    public void addPlayer(String color, String name) {
-        game.addPlayer(new Player(name, color, game.getPlayers().size() + 1));
+    public ArrayList<Player> setPlayers(int numberOfPlayers, String[] names, Color[] colors){
+        ArrayList<Player> players = new ArrayList<>();
+        for(int i = 0; i < numberOfPlayers; i++){
+            players.add(new Player(names[i], colors[i]));
+        }
+        return players;
     }
 
-    public void randomPlayerOrder() {
-        game.randomPlayerOrder();
+    public void attackTerritory(Territory attacker, Territory defender, int attackerDice, int defenderDice){
+        this.game.attackTerritory(attacker, defender);
     }
 
-    public void shuffleObjectives() {
-        game.shuffleObjectives();
+    public void moveTroops(Territory origin, Territory destination, int troops){
+        this.game.moveArmies(origin, destination, troops);
     }
 
-    public void drawObjectives() {
-        game.drawObjectives();
+    public void attackTerritoryNotRandom(Territory attacker, Territory defender, int[] attackerDice, int[] defenderDice){
+        this.game.attackTerritoryNotRandom(attackerDice, defenderDice, attacker, defender);
     }
 
-    public void shuffleCards() {
-        game.shuffleCards();
+
+    public String saveGameState(){
+        return this.game.saveGameState();
     }
 }

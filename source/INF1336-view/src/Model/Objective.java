@@ -1,6 +1,6 @@
 package Model;
 
 interface Objective {
-    public boolean isComplete(Player player);
-    public String getDescription();
+    boolean isComplete(Player player);
+    String getDescription();
 }

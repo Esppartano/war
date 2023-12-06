@@ -1,5 +1,6 @@
 package View;
 
+import Model.Match;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -9,9 +10,10 @@ import java.util.Collections;
 public class Menu
 {
     private JFrame menuFrame, selectionFrame, PlayerFrame, gameFrame;
+    Match match = Match.getInstance();
     private final int width = 1200;
     private final int height = 700;
-    // Delimita a janela
+ // Delimita a janela
     Toolkit tk = Toolkit.getDefaultToolkit();
     Dimension screenSize = tk.getScreenSize();
     int sw = screenSize.width;
@@ -28,13 +30,12 @@ public class Menu
         menuFrame.setResizable(false);
         menuFrame.setLocationRelativeTo(null);
         Container c = menuFrame.getContentPane();
-        
         JButton newGameButton = new JButton("Nova Partida");
         newGameButton.addActionListener(e -> selectPlayers());
         
         JButton continueGameButton = new JButton("Continuar");
         continueGameButton.addActionListener(e -> continueGame());
-        //Fonte personalizada
+        
         Font font = new Font("Times New Roman", Font.BOLD,20);
         newGameButton.setFont(font);
         continueGameButton.setFont(font);
@@ -65,7 +66,7 @@ public class Menu
     	selectionFrame.setLocationRelativeTo(menuFrame);
     	selectionFrame.setLayout(null);
     	
-    	// Cria um botão "Iniciar Partida" para confirmar a seleção
+    	// Crie um botão "Iniciar Partida" para confirmar a seleção
         JButton startGameButton = new JButton("Iniciar Partida");
         
     	// Cria um painel para seleção do número de jogadores
@@ -85,12 +86,12 @@ public class Menu
         p5.setFont(font);
         p6.setFont(font);
         
-        // Adiciona os radio buttons ao grupo   
+        // Adição dos radio buttons ao grupo
         party.add(p3);
         party.add(p4);
         party.add(p5);
         party.add(p6);
-        // Adicione mais radio buttons ao grupo conforme necessário
+       
         selectPL.setBounds((width/8) - 125,(height/4)-200,200,100);
         p3.setBounds(50,80,100,30);
         p4.setBounds(50,110,100,30);
@@ -99,7 +100,7 @@ public class Menu
         startGameButton.setBounds(50,250,200,30);
         
         // Adicione os componentes ao painel
-        c.add(selectPL);    
+        c.add(selectPL);
         c.add(p3);
         c.add(p4);
         c.add(p5);
@@ -109,7 +110,7 @@ public class Menu
         // Configure o ActionListener para o botão "Iniciar Partida"
         startGameButton.addActionListener(e ->
         {
-            int selectedPlayers = 0; // Valor padrão
+            int selectedPlayers = 0; // Valor padrão              
             if (p3.isSelected()) {
                 selectedPlayers = 3;
             } else if (p4.isSelected()) {
@@ -194,6 +195,7 @@ public class Menu
 
         confirmButton.addActionListener(e ->
         {
+
             // Verifique se todos os jogadores fizeram sua seleção
             boolean allPlayersSelected = false;
             System.out.println(num);
@@ -215,9 +217,13 @@ public class Menu
                     allPlayersSelected = true;
             }
                 if (allPlayersSelected==true)
+                {
+                    match.startGame(match.setPlayers(num, playerNames, playerColors));
                     startGame(num, playerColors, playerNames);
+                }                    
                 else 
                     JOptionPane.showMessageDialog(PlayerFrame, "Preencha o nome e escolha a cor para todos os jogadores.", "Atenção!!!", JOptionPane.WARNING_MESSAGE);
+                
         });
 
         randonColor.setBounds(40,280,210,30);
@@ -231,8 +237,7 @@ public class Menu
     // Função para converter o nome da cor em uma instância de java.awt.Color
     private Color getColorForName(String colorName)
     {
-        return switch (colorName)
-        {
+        return switch (colorName) {
             case "Vermelho" -> Color.RED;
             case "Verde" -> Color.GREEN;
             case "Azul" -> Color.BLUE;
@@ -246,7 +251,7 @@ public class Menu
     
     public void startGame(int numPlayers, Color[] playerColors, String[] playerNames)
     {
-        // Crie a janela do jogo
+        // Cria a janela do jogo
         gameFrame = new JFrame("WAR - Jogo");
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setSize(width,height);
@@ -263,12 +268,14 @@ public class Menu
        
         // Mostra a janela do jogo e oculta a janela de seleção de jogadores
         gameFrame.setVisible(true);
-        PlayerFrame.setVisible(false);    
+        PlayerFrame.setVisible(false);
     }
 
     public void saveGame()
     {
         JOptionPane.showMessageDialog(null,"Jogo salvo" , "Salvando...", JOptionPane.INFORMATION_MESSAGE);
+        SaveView save = new SaveView();
+        save.saveGame(this.match);
     	System.out.println("Jogo Salvo");
     }
     
@@ -289,16 +296,16 @@ public class Menu
         JOptionPane.showMessageDialog(null, nomeVencedor  + " venceu a partida." , "Vitória!!!", JOptionPane.INFORMATION_MESSAGE);
         int opcao = JOptionPane.showConfirmDialog(null, "Desejam continuar jogando?", "Continuar ou Sair?", JOptionPane.YES_NO_OPTION);
 
-        if (opcao == JOptionPane.YES_OPTION)
-        {
+        if (opcao == JOptionPane.YES_OPTION) {
             gameFrame.setVisible(false);
-            selectionFrame.setVisible(True);
-            // Reinicia a partida e retorna à janela de seleção de jogadores
+            selectionFrame.setVisible(true);
+            // Reinicializa o tabuleiro ou qualquer configuração necessária para uma nova partida
         } else {
-            // Encerra o jogo ou saia do programa
+            // Encerra o jogo
             System.exit(0);
         }    
 }
+    
     public static void main(String[] args)
     {
         SwingUtilities.invokeLater(() -> new Menu());     

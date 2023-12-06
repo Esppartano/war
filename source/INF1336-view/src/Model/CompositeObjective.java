@@ -1,8 +1,8 @@
 package Model;
 
 class CompositeObjective implements Objective{
-    private String description;
-    private Objective[] objectives;
+    private final String description;
+    private final Objective[] objectives;
 
     protected CompositeObjective(String description, Objective[] objectives) {
         this.description = description;

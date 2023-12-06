@@ -1,7 +1,7 @@
 package Model;
 
+import java.awt.*;
 import java.util.ArrayList;
-import java.util.random.*;
 
 class Player {
     protected String name;
@@ -54,12 +54,13 @@ class Player {
     	return owned;
     }
     
-    protected Player(String name, String color, int order) {
+    protected Player(String name, Color color) {
         this.name = name;
-        this.color = color;
+        this.color = String.valueOf(color);
     }
     
     protected String getName() {
     	return this.name;
     }
+
 }
